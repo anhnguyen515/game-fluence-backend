@@ -3,32 +3,30 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 
 const userRegister = async (req, res) => {
-  const user = req.body;
-  const usernameExisted = await User.findOne({ username: user.username });
-  const emailExisted = await User.findOne({ email: user.email });
+  const { email, password } = req.body;
+  const emailExisted = await User.findOne({ email });
 
-  if (usernameExisted) {
+  if (emailExisted) {
     res.json({
       ok: false,
-      message: "Username has already been taken.",
-    });
-  } else if (emailExisted) {
-    res.json({
-      ok: false,
-      message: "Email has already been taken",
+      msg: "Email has already been taken",
     });
   } else {
-    user.password = await bcrypt.hash(req.body.password, 10);
-    const dbUser = new User({
-      username: user.username,
-      email: user.email,
-      password: user.password,
-    });
-    dbUser.save();
-    res.json({
-      ok: true,
-      message: "Successfully registered!",
-    });
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+    // const dbUser = new User({
+    //   email,
+    //   password: hash,
+    // });
+    // dbUser.save();
+    User.create({ email, password: hash })
+      .then(() =>
+        res.json({
+          ok: true,
+          msg: "Successfully registered!",
+        })
+      )
+      .catch((err) => res.json({ ok: false, msg: err.message }));
   }
 };
 
