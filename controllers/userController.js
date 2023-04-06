@@ -32,7 +32,6 @@ const userRegister = async (req, res) => {
   }
 
   const emailExisted = await User.findOne({ email });
-
   if (emailExisted) {
     return res.json({
       ok: false,
@@ -58,9 +57,40 @@ const userRegister = async (req, res) => {
     );
 };
 
+const userLogin = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.json({
+      ok: false,
+      msg: "All fields must be filled",
+    });
+  }
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.json({
+      ok: false,
+      msg: "User does not exist",
+    });
+  }
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    return res.json({
+      ok: false,
+      msg: "Incorrect password",
+    });
+  }
+  const jwtToken = createToken(user._id);
+  return res.json({
+    ok: true,
+    msg: "Successfully logged in",
+    token: jwtToken,
+  });
+};
+
 const getUserDetail = (req, res) => {
   const { id } = req.params;
-  User.findById(id)
+  // return all data but password
+  User.findById(id, { password: 0 })
     .then((r) =>
       res.json({
         ok: true,
@@ -75,4 +105,4 @@ const getUserDetail = (req, res) => {
     );
 };
 
-module.exports = { userRegister, getUserDetail };
+module.exports = { userLogin, userRegister, getUserDetail };

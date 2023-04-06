@@ -3,16 +3,21 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema(
   {
     email: {
+      type: String,
       required: true,
       unique: true,
-      type: String,
     },
     password: {
-      required: true,
       type: String,
+      required: true,
+    },
+    displayName: {
+      type: String,
+      default: "Anonymous User",
     },
     imageUrl: {
       type: String,
+      default: null,
     },
   },
   { timestamps: true }
