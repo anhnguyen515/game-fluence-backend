@@ -65,6 +65,8 @@ const userLogin = async (req, res) => {
       msg: "All fields must be filled",
     });
   }
+
+  // return all user data but password
   const user = await User.findOne({ email });
   if (!user) {
     return res.json({
@@ -84,12 +86,16 @@ const userLogin = async (req, res) => {
     ok: true,
     msg: "Successfully logged in",
     token: jwtToken,
+    user: {
+      displayName: user.displayName,
+      email,
+    },
   });
 };
 
 const getUserDetail = (req, res) => {
   const { id } = req.params;
-  // return all data but password
+  // return all user data but password
   User.findById(id, { password: 0 })
     .then((r) =>
       res.json({

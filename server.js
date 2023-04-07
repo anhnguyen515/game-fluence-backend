@@ -2,8 +2,9 @@ require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const routes = require("./routes/routes");
-const { PORT, DATABASE_URL } = require("./utils/constants");
+const { PORT, DATABASE_URL, CORS_DOMAIN } = require("./utils/constants");
 
 mongoose.connect(DATABASE_URL);
 const database = mongoose.connection;
@@ -18,6 +19,11 @@ database.once("connected", () => {
 
 const app = express();
 
+app.use(
+  cors({
+    origin: CORS_DOMAIN,
+  })
+);
 app.use(express.json());
 app.use("/api", routes);
 
