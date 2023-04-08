@@ -46,7 +46,12 @@ const userRegister = async (req, res) => {
       const jwtToken = createToken(r._id);
       res.json({
         ok: true,
-        token: jwtToken,
+        msg: "Successfully signed up",
+        user: {
+          displayName: r.displayName,
+          email,
+          token: jwtToken,
+        },
       });
     })
     .catch((err) =>
@@ -85,10 +90,10 @@ const userLogin = async (req, res) => {
   return res.json({
     ok: true,
     msg: "Successfully logged in",
-    token: jwtToken,
     user: {
       displayName: user.displayName,
       email,
+      token: jwtToken,
     },
   });
 };
